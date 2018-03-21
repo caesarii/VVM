@@ -1,0 +1,141 @@
+
+Main1     PC = PC + 1; fetch; goto(MBR)     //
+nop1      goto Main1
+
+iadd1     MAR = SP = SP - 1; rd
+iadd2     H = TOS
+iadd3     MDR = TOS = MDR + H; wr; goto Main1
+
+isub1     MAR = SP = SP - 1; rd
+isub2     H = TOS
+isub3     MDR = TOS = MDR - H; wr; goto Main1
+
+iand1     MAR = SP = SP - 1; rd
+iand2     H = TOS
+iand3     MDR = TOS = MDR AND H; wr; goto Main1
+
+ior1 MAR = SP = SP - 1; rd
+ior2 H = TOS
+ior3 MDR = TOS = MDR OR H; wr; goto Main1
+
+dup1 MAR = SP = SP + 1
+dup2 MDR = TOS; wr; goto Main1;
+
+pop1 MAR = SP = SP - 1; rd
+pop2
+pop3 TOS = MDR; goto Main1
+
+swap1 MAR = SP - 1; rd
+swap2 MAR = SP
+swap3 H = MDR; wr
+swap4 MDR = TOS
+swap5 MAR = SP - 1; wr
+swap6 TOS = H; goto Main1
+
+bipush1 SP = MAR = SP + 1
+bipush2 PC = PC + 1; fetch
+bipush3 MDR = TOS = MBR; wr; goto Main1;
+
+iload1 H = LV
+iload2 MAR = MBRU + H; rd
+iload3 MAR = SP = SP + 1
+iload4 PC = PC + 1; fetch; wr
+iload5 TOS = MDR; goto Main1
+
+istore1 H = LV
+istore2 MAR = MBRU + H
+istore3 MDR = TOS; wr
+istore4 SP = MAR = SP - 1; rd
+istore5 PC = PC + 1; fetch
+istore6 TOS = MDR; goto Main1
+
+
+wide1 PC = PC + 1; fetch;
+
+wide2 goto(MBR OR 0x100)
+
+wide-iload1 PC = PC + 1; fetch
+wide-iload2 H = MBRU <<8
+wide-iload3 H = MBRU OR H
+wide-iload4 MAR = LV + H; rd; goto iload3
+
+wide-istore1 PC = PC + 1; fetch
+wide-istore2 H = MBRU <<8
+wide-istore3 H = MBRU OR H
+wide-istore4 MAR = LV + H; goto istore3
+
+ldc_w1 PC = PC + 1; fetch
+ldc_w2 H = MBRU <<8;
+ldc_w3 H = MBRU OR H;
+ldc_w4 MAR = H + CPP; rd; goto iload3
+
+iinc1 H = LV
+iinc2 MAR = MBRU + H; rd
+iinc3 PC = PC + 1; fetch
+iinc4 H = MDR
+iinc5 PC = PC + 1; fetch
+iinc6 MDR = MBR + H; wr; goto Main1
+
+goto1 OPC = PC - 1
+goto2 PC = PC + 1; fetch
+goto3 H = MBR <<8
+goto4 H = MBRU OR H
+goto5 PC = OPC + H; fetch
+goto6 goto Main1
+
+iflt1 MAR = SP = SP - 1; rd
+iflt2 OPC = TOS
+iflt3 TOS = MDR
+iflt4 N = OPC; if(N) goto Y; else goto F
+
+ifeq1 MAR = SP = SP - 1; rd
+ifeq2 OPC = TOS
+ifeq3 TOS = MDR
+ifeq4 Z = OPC; if(Z) goto T; else goto F
+
+if_icmpeq1 MAR = SP = SP - 1; rd
+if_icmpeq2 MAR = SP = SP - 1
+if_icmpeq3 H = MDR; rd
+if_icmpeq4 OPC = TOS
+if_icmpeq5 TOS = MDR
+if_icmpeq6 Z = OPC - H; if(Z) goto T; else goto F
+
+T OPC = PC - 1
+
+F PC = PC + 1
+F2 PC = PC + 1; fetch
+F3 goto Main1
+
+invokevirtual1 PC = PC + 1
+invokevirtual2 H = MBRU <<8
+invokevirtual3 H = MBRU OR H
+invokevirtual4 MAR = CPP + H; rd
+invokevirtual5 OPC = PC + 1
+invokevirtual6 PC = MDR; fetch
+invokevirtual7 PC = PC + 1; fetch
+invokevirtual8 H = MBRU <<8
+invokevirtual9 H = MBRU OR H
+invokevirtual10 PC = PC + 1; fetch
+invokevirtual11 TOS = SP - H
+invokevirtual12 TOS = MAR = TOS + 1
+invokevirtual13 PC = PC + 1
+invokevirtual14 H = MBRu <<8
+invokevirtual15 H = MBRU OR H
+invokevirtual16 MDR = SP + H + 1; wr
+invokevirtual17 MAR = SP = MDR
+invokevirtual18 MDR = OPC; wr
+invokevirtual19 MAR = SP = SP + 1
+invokevirtual20 MDR = LV; wr
+invokevirtual21 PC = PC + 1; fetch
+invokevirtual22 LV = TOS; goto Main1
+
+iretum1 MAR = SP = LV; rd
+iretum2
+iretum3 LV = MAR = MDR; rd
+iretum4 MAR = LV + 1
+iretum5 PC = MDR; rd; fetch
+iretum6 MAR = SP
+iretum7 LV = MDR
+iretum8 MDR = TOS; wr; goto Main1
+
+
