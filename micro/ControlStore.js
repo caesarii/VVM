@@ -4,10 +4,12 @@
 // 长度为 512 个字, 每个字是 36 位的微指令
 // 时钟周期
 // 1. 从 MPC 只是的存储器位置读出微指令, 存入 MIR
+const BaseObject = require('./BaseObject')
 
-class ControlStore {
+class ControlStore extends BaseObject {
     
     constructor() {
+        super()
         // length 512
         this.data = []
         
@@ -33,4 +35,4 @@ class ControlStore {
     
 }
 
-module.exports = ControlStore
+module.exports = ControlStore.new()
