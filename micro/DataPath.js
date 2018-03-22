@@ -1,5 +1,10 @@
 
 const ALU = require('./ALU')
+const Registers = require('./Register')
+const Bus = require('./Bus')
+const controlStore = require('./ControlStore')
+const Trigger = require('./Trigger')
+
 
 // 4 bit to int 16 译码器
 const translater = (B) => {
@@ -38,27 +43,68 @@ class DataPath {
         this.registers = ['MDR', 'PC', 'MBR', 'MBRU', 'SP', 'LV', 'CPP', 'TOS', 'OPC']
     }
     
+    _alu(ALU, B) {
+        // alu 执行运算, 将结果写入到 busC
+        // ALU 控制位
+        const {F0, F1, ENA, ENB, INVA, INC, SLL8, SRA1, } = ALU
+        // 输入 A
+        const A = this.H
+        // 输入B
+        // B 是一个整数, 按如下顺序映射寄存器
+        const index = translater(B)
+        const register = this.registers[index]
+        const BValue = this[register]
+        const option = {F0, F1, ENA, ENB, INVA, INC, A, B: BValue, SLL8, SRA1}
+        const alu = ALU.new(option)
+        alu.run()
+    }
+    
+    _write(C) {
+        // 将 busC 写入到指定寄存器
+        Object.keys(C).forEach(r => {
+            if(C[r]) {
+                Registers[r].write(Bus.C)
+            }
+        })
+    }
+    
+    _nextInstruction(JAM, NEXT_ADDRESS) {
+        const {JMPC, JAMN, JAMZ} = JAM
+        const {N, Z} = Trigger
+        let F
+        let rest
+        if(JAMN === 1 || JAMZ === 1) {
+            //最高位
+            F = (JAMZ && Z) || (JAMN && N) || NEXT_ADDRESS.slice(0, 1)
+        }
+        
+        if(JMPC === 1) {
+            rest = this.MBR || NEXT_ADDRESS
+        }
+        
+        // 拼接最高位与后8位
+        controlStore.MPC = F + rest
+    }
+    
     start(microInstruction) {
         // instruction 是微指令
         const mi = microInstruction
+        const {ALU, B, C, NEXT_ADDRESS, JAM} = mi
         
-        const {ALU, B:bCode} = mi
+        // 执行微指令
+        // 运行 alu
+        this._alu(ALU, B)
         
-        // ALU 控制位
-        const {F0, F1, ENA, ENB, INVA, INC, SLL8, SRA1, } = ALU
+        // 将 busC 写入到指定寄存器
+        this._write(C)
         
-        // 输入 A
-        const A = this.H
+        // 计算下一条微指令
+        this._nextInstruction(JAM, NEXT_ADDRESS)
         
-        // 输入B
-        // B 是一个整数, 按如下顺序映射寄存器
-        const index = translater(bCode)
-        const register = this.registers[index]
-        const B = this[register]
+        // TODO
+        // M
         
-        const option = {F0, F1, ENA, ENB, INVA, INC, A, B, SLL8, SRA1}
         
-        const alu = new ALU(option)
     }
     
     writeCToRegisters(microinstruction) {
