@@ -1,17 +1,20 @@
 
 
-const ControlStore = require('./ControlStore')
+const controlStore = require('./ControlStore')
 const DataPath = require('./DataPath')
 
 
 class CPU {
     constructor() {
-        this.controlStore = new ControlStore()
         this.DataPath = new DataPath()
         
     }
     
     start() {
-        this.DataPath.start(this.controlStore.MIR)
+        this.DataPath.start(controlStore.MIR)
     }
+}
+
+const __run = () => {
+
 }
