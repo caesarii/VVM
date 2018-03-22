@@ -1,6 +1,6 @@
 const Base = require('./BaseObject')
 
-const Bus = require('./bus')
+const Bus = require('./Bus')
 
 class Register extends Base {
     constructor() {
@@ -35,6 +35,9 @@ class Registers {
         
         this.MBR = Register.new()
         
+        // 无符号 MBR
+        this.MBRU = Register.new()
+        
         this.SP = Register.new()
         
         this.LV = Register.new()
@@ -48,3 +51,5 @@ class Registers {
         this.H = Register.new()
     }
 }
+
+module.exports = new Registers()
