@@ -31,15 +31,15 @@ class MicroInstruction {
         
         // 选择 c 总线的数据要写入的寄存器 9
         this.C = {
-            H: null,
-            OPC: null,
-            TOS: null,
-            CPP: null,
-            LV: null,
-            SP: null,
-            PC: null,
-            MDR: null,
-            MAR: null,
+            H: false,
+            OPC: false,
+            TOS: false,
+            CPP: false,
+            LV: false,
+            SP: false,
+            PC: false,
+            MDR: false,
+            MAR: false,
         }
         
         // 内存操作 3
@@ -51,6 +51,7 @@ class MicroInstruction {
         
         // 选择 b 总线的数据来源, 采用编码方式 4 bit
         // 使用 4To16 译码器 决定那个寄存器驱动  b 总线
+        // 0 - 15 的整数
         this.B = null
           // {
           //       MDR: 0,
