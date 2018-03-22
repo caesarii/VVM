@@ -1,6 +1,11 @@
+const Base = require('./BaseObject')
+const Bus = require('./Bus')
+const Trigger = require('./Trigger')
+const controlStore = require('./ControlStore')
 
-class ALU {
+class ALU extends Base {
     constructor(option) {
+        super()
         const {F0, F1, ENA, ENB, INVA, INC, A, B} = option
         // 6 根ALU 控制线
         // 决定操作 2
@@ -20,18 +25,33 @@ class ALU {
         // 右输入
         this.B = B
         
-        // 输出
-        this.shifter = null
         
         // 控制输出
         // 把移位器的内容左移一个字节
-        this.SLL8 = null
+        this.SLL8 = false
         // 被移位器内容右移1位
-        this.SRA1 = null
+        this.SRA1 = true
         
     }
     
-    run() {
+    _shifter(result) {
+        const {SLL8, SRA1} = this
+        
+        if(SLL8) {
+        
+        }
+        
+        if(SRA1) {
+        
+        }
+        
+        Bus.C = result
+        
+        
+    }
+    
+    
+    _operate() {
         const {F0, F1, ENA, ENB, INVA, INC, A, B} = this
         
         const valueA = F0 === 0 && F1 === 1 && ENA === 1 && ENB === 0 && INVA === 0 && INC === 0
@@ -53,6 +73,8 @@ class ALU {
         const zero = F0 === 0 && F1 === 1 && ENA === 0 && ENB === 1 && INVA === 0 && INC === 0
         const one = F0 === 0 && F1 === 1 && ENA === 0 && ENB === 1 && INVA === 0 && INC === 0
         const subOne = F0 === 0 && F1 === 1 && ENA === 0 && ENB === 1 && INVA === 0 && INC === 0
+        
+        let result
         
         if(valueA) {
             return A
@@ -117,6 +139,16 @@ class ALU {
         
         }
         
+    }
+    
+    
+    run() {
+        const result = this._operate()
+        this._shifter(result)
+        
+        // TODO
+        Trigger.N = null
+        Trigger.Z = null
         
     }
 }
